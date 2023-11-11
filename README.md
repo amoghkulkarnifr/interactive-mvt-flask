@@ -25,5 +25,5 @@ If you run into any errors (which you most probably will), please create an issu
 ### To run the app
 
 ```bash
-python -m flask --app .\src\app.py run
+python -m flask --app .\src\app.py --debug run
 ```
