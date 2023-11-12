@@ -3,7 +3,7 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt import risk_models
 from pypfopt import expected_returns
 
-def get_max_sharpe():
+def test__get_max_sharpe():
   # Read in price data
   df = pd.read_csv("src/utils/mvt/stock_prices.csv", parse_dates=True, index_col="date")
 

@@ -1,5 +1,6 @@
 from flask import Flask
-from .utils.mvt.test import get_max_sharpe
+
+from src.utils.mvt import test__get_max_sharpe
 
 app = Flask(__name__)
 
@@ -15,8 +16,7 @@ def api_list():
 
 @app.route("/api/test")
 def api_test():
-    weights = get_max_sharpe()
-    print(weights)
+    weights = dict(test__get_max_sharpe())
     return {
         "weights": weights
     }
