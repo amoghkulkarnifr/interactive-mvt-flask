@@ -13,8 +13,7 @@
         "FLASK_APP": "src/app.py",
         "FLASK_DEBUG": "1"
       },
-      "args": ["run", "--port", "8000", "--no-debugger", "--no-reload"],
-      // "args": ["run", "--debug"],
+      "args": ["run", "--port", "8000", "--debug"],
       "jinja": true,
       "justMyCode": true
     }
