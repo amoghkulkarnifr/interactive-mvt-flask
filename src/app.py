@@ -1,4 +1,4 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, make_response, request
 from pandas import DataFrame
 
 from src.utils.mvt import test__get_max_sharpe
@@ -11,7 +11,7 @@ app = Flask(__name__)
 def root():
     return "<p>APIs on /api route<p>"
 
-@app.route("/api/")
+@app.route("/api")
 def api_list():
     return {
         "test": "max sharpe portfolio on test data"
@@ -26,8 +26,27 @@ def api_test():
 
 @app.route("/api/data")
 def api_get_data():
-    # _data = get_company_data('ADANIENT')
-    _data = get_company_data(['ADANIENT', 'BAJAJ-AUTO', 'CIPLA', 'HCLTECH', 'HDFCBANK'], to_json=True)
+    _json_data = request.get_json()
+
+    try:
+        _data = get_company_data(company_names=_json_data['data']['companies'], to_json=True)
+    except FileNotFoundError:
+        _err_str = 'Request does not have correct company names'
+        print(_err_str)
+        _resp = make_response({
+            "status": "error",
+            "data": _err_str
+        }, 400)
+        return _resp
+    except KeyError:
+        _err_str = 'Request\'s body does not have correct fields'
+        print(_err_str)
+        _resp = make_response({
+            "status": "error",
+            "data": _err_str
+        }, 400)
+        return _resp
+
     return {
         "status": "OK",
         "data": _data

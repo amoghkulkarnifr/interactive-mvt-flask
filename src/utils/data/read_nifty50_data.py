@@ -9,10 +9,10 @@ def get_company_data(
     if isinstance(company_names, str):
         try:
             _df = pd.read_csv(
-                "data/{}.csv".format(company_names), index_col="Date")
+                "data/{}.csv".format(company_names), parse_dates=not to_json, index_col="Date")
             _df = _df.rename(columns={"Close": company_names})
             if to_json:
-                return _df[[company_names]].to_dict('list')
+                return _df[[company_names]].to_dict('index')
             else:
                 return _df
         except FileNotFoundError as e:
@@ -22,12 +22,12 @@ def get_company_data(
         _dfs = []
         try:
             for name in company_names:
-                _df = pd.read_csv("data/{}.csv".format(name), index_col="Date")
+                _df = pd.read_csv("data/{}.csv".format(name), parse_dates=not to_json, index_col="Date")
                 _df = _df.rename(columns={"Close": name})
                 _dfs.append(_df[[name]])
             _df = pd.concat(_dfs, axis=1)
             if to_json:
-                return _df.to_dict('list')
+                return _df.to_dict('index')
             else:
                 return _df
         except FileNotFoundError as e:
