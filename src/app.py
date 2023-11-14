@@ -29,7 +29,7 @@ def api_get_data():
     _json_data = request.get_json()
 
     try:
-        _data = get_company_data(company_names=_json_data['data']['companies'], to_json=True)
+        _data = get_company_data(company_names=_json_data['companies'], to_json=True)
     except FileNotFoundError:
         _err_str = 'Request does not have correct company names'
         print(_err_str)
@@ -63,7 +63,7 @@ def api_compute():
         abort(400)
     
     if opt_portfolio == "maxSharpeRatio":
-        (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['data']['companies'])
+        (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['companies'])
 
         return {
             "status": "OK",
