@@ -5,7 +5,11 @@ from src.utils.mvt import test__get_max_sharpe
 from src.utils.data import get_company_data
 from src.utils.mvt.compute import compute__max_sharpe
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route("/")
 def root():
