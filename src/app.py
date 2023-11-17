@@ -30,10 +30,9 @@ def api_test():
 
 @app.route("/api/data")
 def api_get_data():
-    _json_data = request.get_json()
-
+    _url_params = request.args.get('companies', '')
     try:
-        _data = get_company_data(company_names=_json_data['companies'], to_json=True)
+        _data = get_company_data(company_names=_url_params.split(','), to_json=True)
     except FileNotFoundError:
         _err_str = 'Request does not have correct company names'
         print(_err_str)
