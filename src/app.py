@@ -96,7 +96,6 @@ def api_compute():
             return __get_error_response_obj(
                 error_msg='Invalid/absent url parameters', 
                 resp_code=400)
-        (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['companies'])
         
         return {
             "status": "OK",
