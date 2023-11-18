@@ -55,7 +55,7 @@ def api_get_data():
         "data": _data
     }
 
-@app.route("/api/compute")
+@app.route("/api/compute", methods=['POST'])
 def api_compute():
     _json_data = request.get_json()
     
