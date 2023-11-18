@@ -3,13 +3,19 @@ from pandas import DataFrame
 
 from src.utils.mvt import test__get_max_sharpe
 from src.utils.data import get_company_data
-from src.utils.mvt.compute import compute__max_sharpe
+from src.utils.mvt.compute import compute__custom, compute__max_sharpe
 
 from flask_cors import CORS
 
 app = Flask(__name__)
-
 CORS(app)
+
+def __get_error_response_obj(resp_code: int, error_msg: str, debug: bool=True):
+    print(error_msg)
+    return make_response({
+        "status": "error",
+        "data": error_msg
+    }, resp_code)
 
 @app.route("/")
 def root():
@@ -34,21 +40,17 @@ def api_get_data():
     try:
         _data = get_company_data(company_names=_url_params.split(','), to_json=True)
     except FileNotFoundError:
-        _err_str = 'Request does not have correct company names'
-        print(_err_str)
-        _resp = make_response({
-            "status": "error",
-            "data": _err_str
-        }, 400)
-        return _resp
+        return __get_error_response_obj(
+            error_msg='Request does not have correct company names', 
+            resp_code=400)
     except KeyError:
-        _err_str = 'Request\'s body does not have correct fields'
-        print(_err_str)
-        _resp = make_response({
-            "status": "error",
-            "data": _err_str
-        }, 400)
-        return _resp
+        return __get_error_response_obj(
+            error_msg='Request\'s body does not have correct fields', 
+            resp_code=400)
+    except:
+        return __get_error_response_obj(
+            error_msg='Server error', 
+            resp_code=400)
 
     return {
         "status": "OK",
@@ -62,11 +64,17 @@ def api_compute():
     try:
         opt_portfolio = request.args.get('optPortfolio', '', type=str)
     except KeyError as e:
-        print('Invalid parameter/s to the compute API')
-        abort(400)
+        return __get_error_response_obj(
+            error_msg='Invalid/absent url parameters', 
+            resp_code=400)
     
     if opt_portfolio == "maxSharpeRatio":
-        (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['companies'])
+        try:
+            (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['companies'])
+        except KeyError as e:
+            return __get_error_response_obj(
+                error_msg='Invalid data in the request body', 
+                resp_code=400)
 
         return {
             "status": "OK",
@@ -79,9 +87,30 @@ def api_compute():
                 }
             }
         }
-    else:
+    elif opt_portfolio == "custom":
+        try:
+            (_weights, _exp_ret, _vol, _sharpe) = compute__custom(
+                company_names=_json_data['companies'],
+                weights=_json_data['weights'])
+        except KeyError as e:
+            return __get_error_response_obj(
+                error_msg='Invalid/absent url parameters', 
+                resp_code=400)
+        (_weights, _exp_ret, _vol, _sharpe) = compute__max_sharpe(company_names=_json_data['companies'])
+        
         return {
             "status": "OK",
-            "data": {}
+            "data": {
+                "weights": _weights,
+                "performance": {
+                    "expectedReturns": _exp_ret,
+                    "volatility": _vol,
+                    "sharpeRatio": _sharpe
+                }
+            }
         }
+    else:
+        return __get_error_response_obj(
+            error_msg='Invalid parameter values',
+            resp_code=400)
     

@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt import risk_models
@@ -41,13 +41,14 @@ def compute__min_volatility(company_names: Union[List[str], str], returns: Optio
 
   return (weights, exp_return, volatility, sharpe_ratio)
 
-def compute__custom(company_names: Union[List[str], str], weights: List[float]):
+def compute__custom(company_names: Union[List[str], str], weights: Dict[str, float]):
   _data = get_company_data(company_names=company_names)
   exp_return = volatility = sharpe_ratio = None
 
   if isinstance(_data, pd.DataFrame):
     ef = __get_efficient_frontier(_data)
     # Call ef.set_weights()
-
-  # 
+    ef.set_weights(input_weights=weights)
+    (exp_return, volatility, sharpe_ratio) = ef.portfolio_performance()
+    
   return (weights, exp_return, volatility, sharpe_ratio)
